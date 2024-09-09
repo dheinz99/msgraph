@@ -1,0 +1,194 @@
+
+## Identify the userid of the mailbox you want to search
+$User = Get-MgUser -Filter "displayName eq 'Mario Marcone'" | Format-List Id
+write-output $User
+Start-Sleep -Seconds 5
+Import-Module Microsoft.Graph.Mail # To work on Mail Accounts
+$userId = '8816a8f1-ac20-4adb-9776-836f0d98ded1'
+#$userId = 'a250734e-9f95-4aa9-b61e-3f881961e913'
+Get-MgUserMessage -UserId $userId -Filter "from/emailAddress/address eq 'bdriver@riolasvegas.com'" -Select "subject,from,receivedDateTime,isRead" -Top 20
+#GET https://graph.microsoft.com/v1.0/users/{8816a8f1-ac20-4adb-9776-836f0d98ded1}/messages?$filter=from/emailAddress/address eq 'xxx@xxxx.com'&$select=subject,from,receivedDateTime,isRead&$top=1
+
+
+
+
+
+Connect-MgGraph -Scopes "User.ReadWrite.All","User.Read.All","Group.ReadWrite.All","Mail.Read","Mail.ReadWrite" ## Identify the userid of the mailbox you want to search $User = Get-MgUser -Filter "displayName eq 'XXXX'" | Format-List Id write-output $User Start-Sleep -Seconds 5 Import-Module Microsoft.Graph.Mail # To work on Mail Accounts $userId = 'xxxxxxxx-xxxxxxxxx-xxxx-xxxxxxxxxxxx' Get-MgUserMessage -UserId $userId -Filter "(from/emailAddress/address) eq 'xxx@xxxx.com" -Select "subject,from,receivedDateTime,isRead" -Top 1
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+
+Your script looks good! Here are a few suggestions to make it more efficient and ensure it works as expected:
+1. Retrieve User ID: Instead of using Format-List, which outputs the result in a format that’s not easy to use programmatically, you can directly access the Id property.
+2. Correct the Filter Syntax: Ensure the filter syntax for Get-MgUserMessage is correct.
+3. Use Variables Consistently: Make sure to use the $User.Id variable correctly.
+Here’s a revised version of your script:
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+# Connect to Microsoft Graph with the required scopes
+Connect-MgGraph -Scopes "User.ReadWrite.All","User.Read.All","Group.ReadWrite.All","Mail.Read","Mail.ReadWrite"
+
+# Identify the user ID of the mailbox you want to search
+$User = Get-MgUser -Filter "displayName eq 'XXXX'"
+$UserId = $User.Id
+Write-Output $UserId
+
+# Pause for 5 seconds
+Start-Sleep -Seconds 5
+
+# Import the Microsoft Graph Mail module
+Import-Module Microsoft.Graph.Mail
+
+# Retrieve the latest message from the specified email address
+Get-MgUserMessage -UserId $UserId -Filter "from/emailAddress/address eq 'xxx@xxxx.com'" -Select "subject,from,receivedDateTime,isRead" -Top 1
+
+
+To correct the filter syntax for the Get-MgUserMessage command, you need to ensure that the filter expression is properly formatted. In your case, the filter should be:
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+-Filter "from/emailAddress/address eq 'xxx@xxxx.com'"
+
+Here’s the updated script with the corrected filter syntax:
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+# Connect to Microsoft Graph with the required scopes
+Connect-MgGraph -Scopes "User.ReadWrite.All","User.Read.All","Group.ReadWrite.All","Mail.Read","Mail.ReadWrite"
+
+# Identify the user ID of the mailbox you want to search
+$User = Get-MgUser -Filter "displayName eq 'XXXX'"
+$UserId = $User.Id
+Write-Output $UserId
+
+# Pause for 5 seconds
+Start-Sleep -Seconds 5
+
+# Import the Microsoft Graph Mail module
+Import-Module Microsoft.Graph.Mail
+
+# Retrieve the latest message from the specified email address
+Get-MgUserMessage -UserId $UserId -Filter "from/emailAddress/address eq 'xxx@xxxx.com'" -Select "subject,from,receivedDateTime,isRead" -Top 1
+
+
+Convert to Graph Query
+
+Sure! Here’s how you can convert your PowerShell script to a Microsoft Graph Explorer query:
+4. Authenticate: Ensure you are logged in to Microsoft Graph Explorer with the necessary permissions.
+5. Get User ID: Use the /users endpoint to get the user ID based on the display name.
+6. Get User Messages: Use the /users/{userId}/messages endpoint to filter and retrieve the messages.
+Here are the steps and corresponding queries:
+Step 1: Get User ID
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+GET https://graph.microsoft.com/v1.0/users?$filter=displayName eq 'XXXX'
+
+Step 2: Get User Messages
+Replace {userId} with the actual user ID obtained from the previous step.
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+GET https://graph.microsoft.com/v1.0/users/{userId}/messages?$filter=from/emailAddress/address eq 'xxx@xxxx.com'&$select=subject,from,receivedDateTime,isRead&$top=1
+
+You can authenticate with Microsoft Graph without signing in as a user by using App-Only Access. This method allows your application to access Microsoft Graph resources using its own identity, rather than on behalf of a user. Here’s how you can set it up:
+Steps to Authenticate with App-Only Access
+7. Register Your App:
+• Go to the Azure Portal and register a new application.
+• Save the Application (client) ID and Directory (tenant) ID.
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+8. Configure API Permissions:
+• In the app registration, go to “API permissions” and add the required Microsoft Graph permissions (e.g., Mail.Read, User.Read.All).
+• Make sure to select “Application permissions” instead of “Delegated permissions”.
+• Grant admin consent for the permissions.
+9. Create a Client Secret:
+• In the app registration, go to “Certificates & secrets” and create a new client secret.
+• Save the client secret value securely.
+10. Get an Access Token:
+• Use the OAuth 2.0 client credentials flow to obtain an access token. You can use tools like Postman or write a script to get the token.
+Example Script to Get Access Token
+Here’s an example using PowerShell to get an access token:
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+$tenantId = "your-tenant-id"
+$clientId = "your-client-id"
+$clientSecret = "your-client-secret"
+$resource = "https://graph.microsoft.com"
+
+$body = @{
+    grant_type    = "client_credentials"
+    scope         = "https://graph.microsoft.com/.default"
+    client_id     = $clientId
+    client_secret = $clientSecret
+}
+
+$response = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token" -ContentType "application/x-www-form-urlencoded" -Body $body
+$accessToken = $response.access_token
+
+Write-Output $accessToken
+
+11. Call Microsoft Graph API:
+• Use the access token to call Microsoft Graph API endpoints.
+Example API Call
+Here’s an example using PowerShell to call the Microsoft Graph API:
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+$accessToken = "your-access-token"
+$uri = "https://graph.microsoft.com/v1.0/users"
+
+$response = Invoke-RestMethod -Method Get -Uri $uri -Headers @{ Authorization = "Bearer $accessToken" }
+
+Write-Output $response
+
+To grant your app read-only access to a specific mailbox, you can use the Application Access Policy feature in Exchange Online. This allows you to restrict the app’s access to only the mailboxes you specify. Here are the steps to set it up:
+Steps to Configure Application Access Policy
+12. Connect to Exchange Online PowerShell:
+• Open PowerShell and connect to Exchange Online.
+Connect-ExchangeOnline -UserPrincipalName your-email@domain.com
+13. Identify the App’s Client ID and Mail-Enabled Security Group:
+• Find the app’s client ID in the Azure portal under “App registrations”.
+• Create a new mail-enabled security group or use an existing one. Note the email address of the group.
+14. Create an Application Access Policy:
+• Use the New-ApplicationAccessPolicy cmdlet to create the policy.
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+
+
+New-ApplicationAccessPolicy -AppId your-app-client-id -PolicyScopeGroupId your-group-email@domain.com -AccessRight RestrictAccess -Description "Restrict this app to specific mailboxes."
+
+Example
+Here’s an example of how you can create an application access policy:
+# Connect to Exchange Online
+Connect-ExchangeOnline -UserPrincipalName admin@contoso.com
+# Create a new application access policy
+New-ApplicationAccessPolicy -AppId e7e4dbfc-046f-4074-9b3b-2ae8f144f59b -PolicyScopeGroupId EvenUsers@contoso.com -AccessRight RestrictAccess -Description "Restrict this app to members of distribution group EvenUsers."
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+
+
+Verify the Policy
+You can verify the policy using the Test-ApplicationAccessPolicy cmdlet:
+Test-ApplicationAccessPolicy -Identity user@domain.com -AppId your-app-client-id
+For more detailed information, you can refer to the Microsoft documentation1.
+Let me know if you need any further assistance! 😊
+
+From <https://www.bing.com/chat?form=NTPCHB> 
+
+
+
+https://learn.microsoft.com/en-us/graph/auth-limit-mailbox-access
+https://techcommunity.microsoft.com/t5/exchange-team-blog/scoping-microsoft-graph-application-permissions-to-specific/ba-p/671881
+https://bing.com/search?q=grant+app+read+only+access+to+specific+mailbox+Microsoft+Graph
+https://www.azure365pro.com/access-specific-office-365-mailbox-using-microsoft-graph/
+https://learn.microsoft.com/en-us/answers/questions/1406369/access-shared-mailbox-via-graph-apihttps://graph.microsoft.com/v1.0/users/
+
+
+
+
